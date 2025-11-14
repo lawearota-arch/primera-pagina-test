@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>INTERVIA · Soporte IT</title>
+  <style>
+    :root { --brand-start:#34d399; --brand-mid:#6366f1; --brand-end:#a855f7; --panel:rgba(10,12,20,0.55); --border:rgba(255,255,255,0.14); --muted:#e0e7ff; --text:#ffffff; --primary:#7c3aed; --accent:#34d399; --danger:#ef4444; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, 'Helvetica Neue', Arial; background: linear-gradient(135deg, var(--brand-start) 0%, var(--brand-mid) 50%, var(--brand-end) 100%); color: var(--text); }
+    header { padding:24px 24px 24px 260px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; backdrop-filter: saturate(140%) blur(8px); }
+    h1 { font-size:20px; margin:0; }
+    .container { max-width: 1100px; margin: 24px 16px; padding: 0; }
+    .tabs { display:flex; flex-direction:column; gap:12px; }
+    .tab { padding:14px 16px; font-size:14px; border:1px solid var(--border); background: rgba(8,10,18,0.45); color:var(--text); border-radius:10px; cursor:pointer; }
+    .tab.active { background: linear-gradient(135deg, rgba(124,58,237,0.25), rgba(52,211,153,0.25)); border-color: rgba(255,255,255,0.25); }
+    .grid { display:grid; grid-template-columns: 1fr 1fr; gap:16px; }
+    .panel { background: var(--panel); border:1px solid var(--border); border-radius:14px; padding:16px; box-shadow: 0 8px 24px rgba(0,0,0,0.25); }
+    .panel h2 { margin:0 0 12px 0; font-size:16px; }
+    label { display:block; font-size:12px; color: var(--muted); margin-bottom:6px; }
+    input, textarea, select { width:100%; padding:10px; border-radius:10px; border:1px solid rgba(255,255,255,0.18); background: rgba(8,10,18,0.6); color:var(--text); }
+    textarea { resize: vertical; min-height: 80px; }
+    .row { display:flex; gap:10px; }
+    .btn { padding:10px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.22); background: linear-gradient(135deg, rgba(124,58,237,0.35), rgba(52,211,153,0.35)); color:var(--text); cursor:pointer; }
+    .btn.primary { background: linear-gradient(135deg, rgba(124,58,237,0.5), rgba(52,211,153,0.5)); }
+    .btn.success { background: rgba(16,51,31,0.6); border-color: rgba(31,109,62,0.6); }
+    .btn.danger { background: rgba(59,14,16,0.6); border-color: rgba(127,29,29,0.6); }
+    .btn:disabled { opacity:.6; cursor:not-allowed; }
+    .list { display:flex; flex-direction:column; gap:10px; }
+    .item { border:1px solid var(--border); background: rgba(8,10,18,0.55); border-radius:12px; padding:12px; }
+    .item h3 { margin:0 0 8px 0; font-size:15px; }
+    .item .meta { display:flex; flex-wrap:wrap; gap:8px; font-size:12px; color:var(--muted); }
+    .item .actions { margin-top:10px; display:flex; gap:8px; }
+    .filters { display:flex; gap:8px; margin-bottom:12px; }
+    .badge { display:inline-block; padding:2px 8px; border-radius:999px; font-size:12px; border:1px solid rgba(255,255,255,0.25); }
+    .badge.low { color:#a3e635; border-color:#3f6212; }
+    .badge.medium { color:#f59e0b; border-color:#7c2d12; }
+    .badge.high { color:#ff6b6b; border-color:#7f1d1d; }
+    .badge.open { color:#c7d2fe; border-color:#3730a3; }
+    .badge.progress { color:#fde68a; border-color:#7c2d12; }
+    .badge.resolved { color:#86efac; border-color:#14532d; }
+    .footer { margin-top:24px; font-size:12px; color:var(--muted); }
+    .split { display:grid; grid-template-columns: 2fr 1fr; gap:16px; }
+    .brand { display:flex; align-items:center; gap:12px; }
+    .brand img { box-shadow: 0 6px 20px rgba(0,0,0,0.25); }
+    .steps { margin-top:10px; display:flex; flex-direction:column; gap:8px; }
+    .step { padding:8px; border-radius:10px; border:1px solid rgba(255,255,255,0.18); background: rgba(8,10,18,0.4); }
+    .step-time { font-size:11px; color: var(--muted); display:block; margin-bottom:4px; }
+    .step-text { font-size:13px; }
+    .add-step textarea { width:100%; margin-top:10px; min-height:60px; }
+    .layout { display:block; }
+    .sidebar { position: fixed; left:0; top:0; height:100vh; width:240px; border-right:1px solid var(--border); background: rgba(8,10,18,0.45); padding:12px; display:flex; align-items:flex-start; justify-content:flex-start; }
+    .sidebar .tabs { margin-top: 96px; width:100%; }
+    .content { min-height: 60vh; margin-left: 260px; width: calc(100vw - 280px); }
+    .status-tabs { display:flex; gap:8px; margin: 16px 0; }
+    .status-tab { padding:10px 14px; border:1px solid var(--border); background: rgba(8,10,18,0.45); color:var(--text); border-radius:999px; cursor:pointer; display:inline-flex; align-items:center; }
+    .status-tab.active { background: linear-gradient(135deg, rgba(124,58,237,0.35), rgba(52,211,153,0.35)); border-color: rgba(255,255,255,0.25); }
+    .status-count { display:inline-flex; align-items:center; justify-content:center; width:18px; height:18px; border-radius:999px; margin-left:8px; border:1px solid rgba(255,255,255,0.25); background: linear-gradient(135deg, rgba(124,58,237,0.35), rgba(52,211,153,0.35)); font-size:11px; color: var(--text); }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <img id="logoImg" alt="Logo" style="height:40px; display:none; border-radius:8px;" />
+      <h1>INTERVIA · Soporte IT</h1>
+    </div>
+    <div class="row">
+      <button class="btn" id="exportBtn">Exportar datos</button>
+      <label for="importInput" class="btn">Importar datos</label>
+      <input id="importInput" type="file" accept="application/json" style="display:none" />
+      <label for="logoInput" class="btn">Cargar logo</label>
+      <input id="logoInput" type="file" accept="image/*" style="display:none" />
+    </div>
+  </header>
+
+  <div class="container layout">
+    <aside class="sidebar">
+      <div class="tabs">
+        <button class="tab active" data-tab="tickets">Tickets</button>
+        <button class="tab" data-tab="editor">Nuevo Ticket</button>
+        <button class="tab" data-tab="usuarios">Usuarios</button>
+        <button class="tab" data-tab="empresas">Empresas</button>
+      </div>
+    </aside>
+    <main class="content">
+    <div class="status-tabs">
+      <button class="status-tab" data-status="open">Abierto <span class="status-count" data-for="open">0</span></button>
+      <button class="status-tab" data-status="progress">En proceso <span class="status-count" data-for="progress">0</span></button>
+      <button class="status-tab" data-status="resolved">Finalizado <span class="status-count" data-for="resolved">0</span></button>
+    </div>
+    <section id="tab-tickets">
+      <div class="panel">
+        <h2>Tickets</h2>
+        <div class="filters">
+          <select id="filterCompany"></select>
+          <select id="filterUser"></select>
+          <select id="filterStatus">
+            <option value="">Estado: todos</option>
+            <option value="open">Abierto</option>
+            <option value="progress">En progreso</option>
+            <option value="resolved">Resuelto</option>
+          </select>
+          <select id="filterPriority">
+            <option value="">Prioridad: todas</option>
+            <option value="low">Baja</option>
+            <option value="medium">Media</option>
+            <option value="high">Alta</option>
+          </select>
+        </div>
+        <div class="list" id="ticketsList"></div>
+        <button class="btn primary" id="fabNew" style="position:fixed; right:24px; bottom:24px; border-radius:999px; width:56px; height:56px; display:flex; align-items:center; justify-content:center; font-size:22px;">✏️</button>
+      </div>
+    </section>
+
+    <section id="tab-editor" class="grid" style="display:none">
+      <div class="panel" style="grid-column:1/-1">
+        <h2>Crear / Editar Ticket</h2>
+        <form id="ticketForm">
+          <input type="hidden" id="ticketId" />
+          <label>Título</label>
+          <input id="ticketTitle" required />
+          <label>Descripción</label>
+          <textarea id="ticketDesc" required></textarea>
+          <div class="row">
+            <div style="flex:1">
+              <label>Prioridad</label>
+              <select id="ticketPriority">
+                <option value="low">Baja</option>
+                <option value="medium">Media</option>
+                <option value="high">Alta</option>
+              </select>
+            </div>
+            <div style="flex:1">
+              <label>Estado</label>
+              <select id="ticketStatus">
+                <option value="open">Abierto</option>
+                <option value="progress">En progreso</option>
+                <option value="resolved">Resuelto</option>
+              </select>
+            </div>
+          </div>
+          <div class="row">
+            <div style="flex:1">
+              <label>Usuario asignado</label>
+              <select id="ticketUser"></select>
+            </div>
+            <div style="flex:1">
+              <label>Empresa</label>
+              <select id="ticketCompany"></select>
+            </div>
+          </div>
+          <div class="row" style="margin-top:12px">
+            <button class="btn primary" type="submit" id="saveTicketBtn">Guardar ticket</button>
+            <button class="btn primary" type="button" id="resetTicketBtn">Limpiar</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <section id="tab-usuarios" class="grid" style="display:none">
+      <div class="panel">
+        <h2>Agregar Usuario</h2>
+        <form id="userForm">
+          <input type="hidden" id="userId" />
+          <label>Nombre</label>
+          <input id="userName" required />
+          <label>Email</label>
+          <input id="userEmail" type="email" required />
+          <div class="row" style="margin-top:12px">
+            <button class="btn primary" type="submit">Guardar usuario</button>
+            <button class="btn primary" type="button" id="resetUserBtn">Limpiar</button>
+          </div>
+        </form>
+      </div>
+      <div class="panel">
+        <h2>Usuarios</h2>
+        <div class="list" id="usersList"></div>
+      </div>
+    </section>
+
+    <section id="tab-empresas" class="grid" style="display:none">
+      <div class="panel">
+        <h2>Agregar Empresa</h2>
+        <form id="companyForm">
+          <input type="hidden" id="companyId" />
+          <label>Nombre</label>
+          <input id="companyName" required />
+          <div class="row" style="margin-top:12px">
+            <button class="btn primary" type="submit">Guardar empresa</button>
+            <button class="btn primary" type="button" id="resetCompanyBtn">Limpiar</button>
+          </div>
+        </form>
+      </div>
+      <div class="panel">
+        <h2>Empresas</h2>
+        <div class="list" id="companiesList"></div>
+      </div>
+    </section>
+
+    <div class="footer">Datos almacenados localmente en el navegador (localStorage). Usa exportar/importar para respaldos.</div>
+    </main>
+  </div>
+
+  <script>
+    const store = {
+      get: (k) => JSON.parse(localStorage.getItem(k) || '[]'),
+      set: (k, v) => localStorage.setItem(k, JSON.stringify(v)),
+    };
+    const ids = { users: 'itsupport_users', companies: 'itsupport_companies', tickets: 'itsupport_tickets' };
+    function uid() { return Math.random().toString(36).slice(2) + Date.now().toString(36); }
+
+    function initSeed() {
+      const users = store.get(ids.users);
+      const companies = store.get(ids.companies);
+      const tickets = store.get(ids.tickets);
+      if (users.length === 0) store.set(ids.users, [{ id: uid(), name: 'Admin', email: 'admin@example.com' }, { id: uid(), name: 'Soporte', email: 'soporte@example.com' }]);
+      if (companies.length === 0) store.set(ids.companies, [{ id: uid(), name: 'Acme S.A.' }, { id: uid(), name: 'Globant' }]);
+      if (tickets.length === 0) {
+        const u = store.get(ids.users)[0];
+        const c = store.get(ids.companies)[0];
+        store.set(ids.tickets, [{ id: uid(), title: 'Configurar VPN', description: 'Usuario no puede acceder a recursos internos.', priority: 'high', status: 'open', userId: u.id, companyId: c.id, createdAt: Date.now(), steps: [{ id: uid(), text: 'Ticket creado', createdAt: Date.now() }] }]);
+      }
+    }
+
+    function byId(id){ return document.getElementById(id); }
+    function setOptions(select, items, placeholder) {
+      select.innerHTML = '';
+      if (placeholder) {
+        const o = document.createElement('option'); o.value = ''; o.textContent = placeholder; select.appendChild(o);
+      }
+      items.forEach(it => { const o = document.createElement('option'); o.value = it.id; o.textContent = it.name || it.email || it.title; select.appendChild(o); });
+    }
+    function badge(cls, text){ return `<span class="badge ${cls}">${text}</span>` }
+
+    function renderUsers() {
+      const users = store.get(ids.users);
+      const list = byId('usersList');
+      list.innerHTML = '';
+      users.forEach(u => {
+        const div = document.createElement('div'); div.className = 'item';
+        div.innerHTML = `<h3>${u.name}</h3><div class="meta">${u.email}</div>`;
+        const actions = document.createElement('div'); actions.className = 'actions';
+        const edit = document.createElement('button'); edit.className = 'btn'; edit.textContent = 'Editar'; edit.onclick = () => { byId('userId').value = u.id; byId('userName').value = u.name; byId('userEmail').value = u.email; };
+        const del = document.createElement('button'); del.className = 'btn danger'; del.textContent = 'Eliminar'; del.onclick = () => { const arr = store.get(ids.users).filter(x => x.id !== u.id); store.set(ids.users, arr); renderUsers(); renderSelects(); renderTickets(); };
+        actions.appendChild(edit); actions.appendChild(del); div.appendChild(actions); list.appendChild(div);
+      });
+    }
+
+    function renderCompanies() {
+      const companies = store.get(ids.companies);
+      const list = byId('companiesList');
+      list.innerHTML = '';
+      companies.forEach(c => {
+        const div = document.createElement('div'); div.className = 'item';
+        div.innerHTML = `<h3>${c.name}</h3>`;
+        const actions = document.createElement('div'); actions.className = 'actions';
+        const edit = document.createElement('button'); edit.className = 'btn'; edit.textContent = 'Editar'; edit.onclick = () => { byId('companyId').value = c.id; byId('companyName').value = c.name; };
+        const del = document.createElement('button'); del.className = 'btn danger'; del.textContent = 'Eliminar'; del.onclick = () => { const arr = store.get(ids.companies).filter(x => x.id !== c.id); store.set(ids.companies, arr); renderCompanies(); renderSelects(); renderTickets(); };
+        actions.appendChild(edit); actions.appendChild(del); div.appendChild(actions); list.appendChild(div);
+      });
+    }
+
+    function renderSelects() {
+      const users = store.get(ids.users);
+      const companies = store.get(ids.companies);
+      setOptions(byId('ticketUser'), users);
+      setOptions(byId('ticketCompany'), companies);
+      setOptions(byId('filterUser'), [{ id:'', name:'Usuario: todos' }, ...users], 'Usuario: todos');
+      setOptions(byId('filterCompany'), [{ id:'', name:'Empresa: todas' }, ...companies], 'Empresa: todas');
+    }
+
+    function renderTickets() {
+      const tickets = store.get(ids.tickets).sort((a,b)=>b.createdAt-a.createdAt);
+      const users = store.get(ids.users);
+      const companies = store.get(ids.companies);
+      const fCompany = byId('filterCompany').value;
+      const fUser = byId('filterUser').value;
+      const fStatus = byId('filterStatus').value;
+      const fPriority = byId('filterPriority').value;
+      const list = byId('ticketsList');
+      list.innerHTML='';
+      tickets.filter(t => (!fCompany || t.companyId === fCompany) && (!fUser || t.userId === fUser) && (!fStatus || t.status === fStatus) && (!fPriority || t.priority === fPriority)).forEach(t => {
+        const user = users.find(u=>u.id===t.userId);
+        const comp = companies.find(c=>c.id===t.companyId);
+        const div = document.createElement('div'); div.className='item';
+        const priText = t.priority==='low'?'Baja':t.priority==='medium'?'Media':'Alta';
+        const stText = t.status==='open'?'Abierto':t.status==='progress'?'En progreso':'Resuelto';
+        const stepsHtml = (t.steps && t.steps.length) ? t.steps.map(s=>`<div class="step"><span class="step-time">${new Date(s.createdAt).toLocaleString()}</span><div class="step-text">${s.text}</div></div>`).join('') : '<div class="meta">Sin pasos</div>';
+        const addHtml = t.status==='resolved' ? '' : `<div class="add-step"><textarea id="step-${t.id}" placeholder="Añadir paso"></textarea><div class="row" style="margin-top:8px"><button class="btn primary" id="btn-step-${t.id}">Añadir paso</button></div></div>`;
+        div.innerHTML = `<h3>${t.title}</h3>
+          <div class="meta">${new Date(t.createdAt).toLocaleString()} · ${user?user.name:'Sin usuario'} · ${comp?comp.name:'Sin empresa'} · ${badge(t.priority, priText)} · ${badge(t.status, stText)}</div>
+          <div>${t.description}</div>
+          <div class="steps">${stepsHtml}</div>
+          ${addHtml}`;
+        const actions = document.createElement('div'); actions.className='actions';
+        const edit = document.createElement('button'); edit.className='btn'; edit.textContent='Editar'; edit.onclick=()=>{
+          byId('ticketId').value = t.id;
+          byId('ticketTitle').value = t.title;
+          byId('ticketDesc').value = t.description;
+          byId('ticketPriority').value = t.priority;
+          byId('ticketStatus').value = t.status;
+          byId('ticketUser').value = t.userId || '';
+          byId('ticketCompany').value = t.companyId || '';
+          document.querySelector('.tab[data-tab="editor"]').click();
+        };
+        if (t.status !== 'resolved') {
+          const advance = document.createElement('button'); advance.className='btn success'; advance.textContent='Avanzar estado'; advance.onclick=()=>{
+            const order=['open','progress','resolved'];
+            const idx = order.indexOf(t.status); t.status = order[Math.min(idx+1, order.length-1)];
+            const arr = store.get(ids.tickets).map(x=>x.id===t.id?t:x); store.set(ids.tickets, arr); renderTickets();
+          };
+          actions.appendChild(advance);
+        }
+        const del = document.createElement('button'); del.className='btn danger'; del.textContent='Eliminar'; del.onclick=()=>{
+          const arr = store.get(ids.tickets).filter(x=>x.id!==t.id); store.set(ids.tickets, arr); renderTickets();
+        };
+        actions.appendChild(edit); actions.appendChild(del); div.appendChild(actions); list.appendChild(div);
+        const addBtn = byId(`btn-step-${t.id}`);
+        if (addBtn) addBtn.onclick = ()=>{ const v = byId(`step-${t.id}`).value.trim(); if(!v) return; const arr = store.get(ids.tickets).map(x=>x.id===t.id? { ...x, steps: [ ...(x.steps||[]), { id: uid(), text: v, createdAt: Date.now() } ] } : x ); store.set(ids.tickets, arr); renderTickets(); };
+      });
+
+      const all = store.get(ids.tickets);
+      const counts = { open:0, progress:0, resolved:0 };
+      all.forEach(x=>{ if(counts[x.status] !== undefined) counts[x.status]++; });
+      const cOpen = document.querySelector('.status-count[data-for="open"]'); if(cOpen) cOpen.textContent = counts.open;
+      const cProg = document.querySelector('.status-count[data-for="progress"]'); if(cProg) cProg.textContent = counts.progress;
+      const cRes = document.querySelector('.status-count[data-for="resolved"]'); if(cRes) cRes.textContent = counts.resolved;
+    }
+
+    function clearTicketForm(){ byId('ticketForm').reset(); byId('ticketId').value=''; }
+    function clearUserForm(){ byId('userForm').reset(); byId('userId').value=''; }
+    function clearCompanyForm(){ byId('companyForm').reset(); byId('companyId').value=''; }
+
+    function setLogo(url){ const img = byId('logoImg'); if(url){ img.src = url; img.style.display='block'; } else { img.style.display='none'; } }
+
+    function bindEvents(){
+      document.querySelectorAll('.tab').forEach(btn=>{
+        btn.onclick=()=>{
+          document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active')); btn.classList.add('active');
+          const id = btn.getAttribute('data-tab');
+          byId('tab-tickets').style.display = id==='tickets'? 'block':'none';
+          byId('tab-editor').style.display = id==='editor'? 'grid':'none';
+          byId('tab-usuarios').style.display = id==='usuarios'? 'grid':'none';
+          byId('tab-empresas').style.display = id==='empresas'? 'grid':'none';
+        };
+      });
+
+      byId('ticketForm').onsubmit = (e)=>{
+        e.preventDefault();
+        const id = byId('ticketId').value || uid();
+        const t = {
+          id,
+          title: byId('ticketTitle').value.trim(),
+          description: byId('ticketDesc').value.trim(),
+          priority: byId('ticketPriority').value,
+          status: byId('ticketStatus').value,
+          userId: byId('ticketUser').value || null,
+          companyId: byId('ticketCompany').value || null,
+          createdAt: byId('ticketId').value ? store.get(ids.tickets).find(x=>x.id===id).createdAt : Date.now(),
+          steps: byId('ticketId').value ? (store.get(ids.tickets).find(x=>x.id===id).steps || []) : []
+        };
+        const arr = store.get(ids.tickets);
+        const exists = arr.some(x=>x.id===id);
+        store.set(ids.tickets, exists? arr.map(x=>x.id===id?t:x): [t, ...arr]);
+        clearTicketForm();
+        document.querySelector('.tab[data-tab="tickets"]').click();
+        renderTickets();
+      };
+      byId('resetTicketBtn').onclick = ()=> clearTicketForm();
+
+      byId('userForm').onsubmit = (e)=>{
+        e.preventDefault();
+        const id = byId('userId').value || uid();
+        const u = { id, name: byId('userName').value.trim(), email: byId('userEmail').value.trim() };
+        const arr = store.get(ids.users);
+        const exists = arr.some(x=>x.id===id);
+        store.set(ids.users, exists? arr.map(x=>x.id===id?u:x): [u, ...arr]);
+        clearUserForm(); renderUsers(); renderSelects(); renderTickets();
+      };
+      byId('resetUserBtn').onclick = ()=> clearUserForm();
+
+      byId('companyForm').onsubmit = (e)=>{
+        e.preventDefault();
+        const id = byId('companyId').value || uid();
+        const c = { id, name: byId('companyName').value.trim() };
+        const arr = store.get(ids.companies);
+        const exists = arr.some(x=>x.id===id);
+        store.set(ids.companies, exists? arr.map(x=>x.id===id?c:x): [c, ...arr]);
+        clearCompanyForm(); renderCompanies(); renderSelects(); renderTickets();
+      };
+      byId('resetCompanyBtn').onclick = ()=> clearCompanyForm();
+
+      ['filterCompany','filterUser','filterStatus','filterPriority'].forEach(id=>{ byId(id).onchange = renderTickets; });
+
+      byId('fabNew').onclick = ()=> { document.querySelector('.tab[data-tab="editor"]').click(); clearTicketForm(); };
+
+      byId('exportBtn').onclick = ()=>{
+        const data = { users: store.get(ids.users), companies: store.get(ids.companies), tickets: store.get(ids.tickets) };
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a'); a.href = url; a.download = 'soporte_it_backup.json'; a.click(); URL.revokeObjectURL(url);
+      };
+      byId('importInput').onchange = async (e)=>{
+        const file = e.target.files[0]; if(!file) return;
+        const text = await file.text();
+        const data = JSON.parse(text);
+        if (Array.isArray(data.users)) store.set(ids.users, data.users);
+        if (Array.isArray(data.companies)) store.set(ids.companies, data.companies);
+        if (Array.isArray(data.tickets)) store.set(ids.tickets, data.tickets);
+        renderUsers(); renderCompanies(); renderSelects(); renderTickets();
+      };
+
+      byId('logoInput').onchange = (e)=>{
+        const file = e.target.files[0]; if(!file) return;
+        const reader = new FileReader();
+        reader.onload = () => { localStorage.setItem('itsupport_logo', reader.result); setLogo(reader.result); };
+        reader.readAsDataURL(file);
+      };
+
+      document.querySelectorAll('.status-tab').forEach(btn=>{
+        btn.onclick=()=>{
+          document.querySelectorAll('.status-tab').forEach(b=>b.classList.remove('active'));
+          btn.classList.add('active');
+          byId('filterStatus').value = btn.getAttribute('data-status');
+          renderTickets();
+        };
+      });
+    }
+
+    initSeed();
+    renderUsers();
+    renderCompanies();
+    renderSelects();
+    byId('filterStatus').value = 'open';
+    const stInit = document.querySelector('.status-tab[data-status="open"]'); if(stInit) stInit.classList.add('active');
+    renderTickets();
+    setLogo(localStorage.getItem('itsupport_logo'));
+    bindEvents();
+  </script>
+</body>
+</html>
